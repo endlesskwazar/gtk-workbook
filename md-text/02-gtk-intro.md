@@ -68,9 +68,15 @@ GObject - частина бібліотеки GLib, що реалізує об'�
 
 # Налаштування середовища розробки
 
+## Visual Studio 2017 на плафтормі Windows
+
+## Clion на платформі Windows
+
+## Clion на платформі Linux
+
 # Перша програма
 
-```
+```cpp
 #include <gtk/gtk.h>
 
 int main (int argc, char **argv)
@@ -95,13 +101,13 @@ int main (int argc, char **argv)
 
 Ми можемо пов'язати певну подію, яка повинна відбутися з віджетом, зі своєю функцією.
 
-```
+```cpp
 g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 ```
 
 В даному випадку це стандартна фунция gtk_main_quit (), яка безпечно завершить наш додаток.
 
-```
+```cpp
 #include <gtk/gtk.h>
 
 int main (int argc, char **argv)
@@ -126,7 +132,7 @@ int main (int argc, char **argv)
 
 Для початку додамо кнопку:
 
-```
+```cpp
 GtkWidget *button;
 button = gtk_button_new_with_label("Click Me!!!");
 
@@ -135,7 +141,7 @@ gtk_container_add(GTK_CONTAINER(window), button);
 
 Весь код програми:
 
-```
+```cpp
 #include <gtk/gtk.h>
 
 int main (int argc, char **argv)
@@ -171,7 +177,7 @@ int main (int argc, char **argv)
 
 Створимо функцію on_button_click, яка буде змінювати текст кнопки:
 
-```
+```cpp
 void on_button_click(GtkButton *button, gpointer data)
 {
     gtk_button_set_label(button, "Button was clicked");
@@ -180,13 +186,13 @@ void on_button_click(GtkButton *button, gpointer data)
 
 Тепер зв'яжимо сигнал "clicked" кнопки і функцію on_button_click
 
-```
+```cpp
 g_signal_connect(GTK_BUTTON(button), "clicked", G_CALLBACK(on_button_click), NULL);
 ```
 
 Тепер джерельний код програми наступний:
 
-```
+```cpp
 #include <gtk/gtk.h>
 
 void on_button_click(GtkButton *button, gpointer data)
