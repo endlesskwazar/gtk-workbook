@@ -1,5 +1,5 @@
 const gulp = require('gulp');
-var markdown = require('gulp-markdown-github-style');
+var gulpMdToHtml = require("gulp-md-to-html");
 var rename = require("gulp-rename");
 var insert = require('gulp-insert');
 
@@ -10,9 +10,9 @@ gulp.task('resources', () => {
 });
 
 gulp.task('md', () => {
-    return gulp.src('md-text/*.md')
-        .pipe(markdown())
-        .pipe(gulp.dest('dist/workbook'));
+  return gulp.src('md-text/*.md')
+  .pipe(gulpMdToHtml())
+  .pipe(gulp.dest('dist/workbook'));
 });
 
 gulp.task('presentations', () => {
