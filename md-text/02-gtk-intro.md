@@ -364,9 +364,65 @@ container_add_child (container, create_child());
 
 # Налаштування середовища розробки
 
-## Visual Studio 2017 на плафтормі Windows
-
 ## Clion на платформі Windows
+
+Завантажте і установіть [MSYS2](https://www.msys2.org/)
+
+![](../resources/img/intro/img-3.png)
+
+![](../resources/img/intro/img-4.png)
+
+Відкрийте MSYS2 Shell і виконайте наступну команду:
+
+```bash
+pacman -S mingw-w64-x86_64-toolchain base-devel mingw-w64-x86_64-gtk3
+```
+
+![](../resources/img/intro/img-5.png)
+
+Додайте шляхи до MSYS2 і MinGW в системну змінну PATH:
+
+![](../resources/img/intro/img-6.png)
+
+![](../resources/img/intro/img-7.png)
+
+![](../resources/img/intro/img-8.png)
+
+Завантажте і установіть CLion.
+
+При першому запуску сконфігуруйте Toolchain для роботи із MinGW всередині MSYS2:
+
+![](../resources/img/intro/img-9.png)
+
+CLion за замовчуванням собирає проекти, з використанням CMake:
+
+![](../resources/img/intro/img-10.png)
+
+Для того, щоб працювати із GTK потрібно модифікувати CMakeLists.txt наступним чином:
+
+```
+cmake_minimum_required(VERSION 3.13)
+project(untitled)
+
+set(CMAKE_CXX_STANDARD 14)
+
+FIND_PACKAGE(PkgConfig REQUIRED)
+PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
+
+INCLUDE_DIRECTORIES(${GTK3_INCLUDE_DIRS})
+LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS})
+
+# Add other flags to the compiler
+ADD_DEFINITIONS(${GTK3_CFLAGS_OTHER})
+
+add_executable(untitled main.cpp)
+
+TARGET_LINK_LIBRARIES(untitled ${GTK3_LIBRARIES})
+```
+
+Де untitled потрібно замінити, назвою вашого проекта.
+
+![](../resources/img/intro/img-11.png)
 
 # Перша програма
 
@@ -467,7 +523,8 @@ int main (int argc, char **argv)
   gtk_main();
 }
 ```
-## Завершення програми за допомогою кнопки
+
+## Зміна напису на кнопці
 
 Тепер створимо кнопку, після натискання на яку надпис на кнопці буде змінюватися.
 
@@ -567,7 +624,7 @@ int main (int argc, char **argv)
 
 # Домашнє завдання
 
-## Варіанти
+Розробіть GTK - застосунок. Встановіть заголовок вікна рівний вашому прізвищу та ініціали. Додайте кнопку, при натиск на яку GTK - застосунок безпечно завершує свою роботу.
 
 # Контрольні запитання
 
