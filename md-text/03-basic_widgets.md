@@ -888,7 +888,87 @@ int main (int argc, char **argv)
 }
 ```
 
-# GtkSpinButton
+## GtkComboBox with text
+
+```cpp
+#include <gtk/gtk.h>
+int main (int argc, char **argv)
+{
+    GtkWidget* window;
+    GtkWidget* comboBox;
+    GtkWidget* box;
+
+
+    gtk_init(&argc, &argv);
+
+    //inti the window
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "Hello world");
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+    //init
+    comboBox = gtk_combo_box_text_new();
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBox), NULL, "Don't install.");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBox), NULL, "This user only.");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBox), NULL, "All users");
+
+    //add widgets to window
+    gtk_box_pack_start(GTK_BOX(box), comboBox, true, true, 0);
+    gtk_container_add(GTK_CONTAINER(window), box);
+
+    //show the window
+    gtk_widget_show_all(window);
+    gtk_main();
+}
+```
+
+## GtkComboBox with model
+
+```cpp
+#include <gtk/gtk.h>
+int main (int argc, char **argv)
+{
+    GtkWidget* window;
+    GtkWidget* comboBox;
+    GtkTreeIter iter;
+    GtkListStore *liststore;
+    GtkWidget* box;
+
+
+    gtk_init(&argc, &argv);
+
+    //inti the window
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "Hello world");
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
+    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+    //init
+    liststore = gtk_list_store_new(1, G_TYPE_STRING);
+    gtk_list_store_insert_with_values (liststore, &iter, 0, 0, "Don't install.", -1);
+    gtk_list_store_insert_with_values (liststore, &iter, 1, 0, "This user only.", -1);
+    gtk_list_store_insert_with_values (liststore, &iter, 2, 0, "All users.", -1);
+
+    comboBox = gtk_combo_box_new_with_model(GTK_TREE_MODEL(liststore));
+    GtkCellRenderer *combocell = gtk_cell_renderer_text_new ();
+    gtk_cell_layout_pack_start( GTK_CELL_LAYOUT(comboBox), combocell, TRUE );
+    gtk_cell_layout_set_attributes( GTK_CELL_LAYOUT(comboBox), combocell, "text", 0, NULL );
+    gtk_combo_box_set_active (GTK_COMBO_BOX(comboBox), 1);
+
+    //add widgets to window
+    gtk_box_pack_start(GTK_BOX(box), comboBox, true, true, 0);
+    gtk_container_add(GTK_CONTAINER(window), box);
+
+    //show the window
+    gtk_widget_show_all(window);
+    gtk_main();
+}
+```
+
+
 
 # GtkSwitch
 
