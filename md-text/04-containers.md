@@ -607,10 +607,6 @@ int main (int argc, char **argv)
 }
 ```
 
-## GtkRevealer
-
-
-
 ## GtkNotebook
 
 **GtkNotebook** - контейнер для реалізації вкладок.
@@ -759,13 +755,34 @@ int main (int argc, char **argv)
     gtk_widget_show_all(window);
     gtk_main();
 }
-
-
 ```
 
 # Домашнє завдання
 
+Використовуючи GtkBox або GtkGrid змоделюйте розташування кнобок(GtkButton) згідно із варіантом. Проект залийте на шілку lb-4.
+
 ## Варіанти
 
+1.
+![](../resources/img/containers/img-6.png)
+
+2.
+![](../resources/img/containers/img-7.png)
+
+3.
+![](../resources/img/containers/img-8.png)
+
+4.
+![](../resources/img/containers/img-9.png)
+
+5.
+![](../resources/img/containers/img-10.png)
+
+
 # Контрольні запитання
+1. Що таке контейнер?
+2. Яка відмінність між GtkContainer і GtkBin?
+3. Абсолютне позиціонування за допомогою GtkFixed.
+4. Відносне позиціонування за допомогою контейнера GtkBox.
+5. Позиціонуваання віджетів за допомогою GtkGrid.
 
