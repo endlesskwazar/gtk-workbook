@@ -131,6 +131,20 @@ static guint my_ip_address_signals[LAST_SIGNAL] = { 0 };
 
 Інше перерахування містить ідентифікатори властивостей. Оскільки всі ваші ідентифікатори властивості повинні бути більше нуля, коли оголошено, традиційно розміщувати початкове значення переліку PROP_0. Інші значення переліку відносяться до чотирьох цілих чисел, які будуть складати IP-адресу. Вони використовуються тільки при додаванні сигналів до класу віджетів. Програмісти, які використовують новий віджет, можуть використовувати імена властивостей, які ви пізніше визначите.
 
+**Винисимо декларації деяких функцій наверх** їх ми розглянемо пізніши:
+
+```cpp
+static void my_ip_address_class_init (MyIPAddressClass*);
+static void my_ip_address_init (MyIPAddress*);
+static void my_ip_address_get_property (GObject*, guint, GValue*, GParamSpec*);
+static void my_ip_address_set_property (GObject*, guint,
+                                        const GValue*, GParamSpec*);
+
+static void my_ip_address_render (MyIPAddress*);
+static void my_ip_address_move_cursor (GObject*, GParamSpec*);
+static gboolean my_ip_address_key_pressed (GtkEntry*, GdkEventKey*);
+```
+
 **У заголовному файлі** ми визначили прототип функції my_ip_address_get_type () Ця функція повертає значення GType, яке є просто числовим значенням, унікальним для зареєстрованого типу. У цьому випадку зареєстрованим типом є об'єкт MyIPAddress.
 
 ```cpp
@@ -154,8 +168,8 @@ my_ip_address_get_type (void)
       (GInstanceInitFunc) my_ip_address_init,
     };
 
-    entry_type = g_type_register_static (GTK_TYPE_ENTRY, "MyIPAddress",
-                                         &entry_info, 0);
+     entry_type = g_type_register_static (GTK_TYPE_ENTRY, "MyIPAddress",
+                                             &entry_info, static_cast<GTypeFlags>(0));
   }
 
   return entry_type;
@@ -208,10 +222,10 @@ my_ip_address_class_init (MyIPAddressClass *klass)
 
   /* Реєструємо сигнал */
   my_ip_address_signals[CHANGED_SIGNAL] =
-         g_signal_new ("ip-changed", G_TYPE_FROM_CLASS (klass),
-                       G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-                       G_STRUCT_OFFSET (MyIPAddressClass, ip_changed),
-                       NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+            g_signal_new ("ip-changed", G_TYPE_FROM_CLASS (klass),
+                          G_SIGNAL_RUN_FIRST,
+                          G_STRUCT_OFFSET (MyIPAddressClass, ip_changed),
+                          NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   /* Реєструємо атрибути */
   g_object_class_install_property (gobject_class, PROP_IP1,
@@ -442,57 +456,50 @@ my_ip_address_move_cursor (GObject *entry,
 
 }
 
-/* Handle key presses of numbers, tabs, backspaces and returns. */
 static gboolean
 my_ip_address_key_pressed (GtkEntry *entry,
                            GdkEventKey *event)
 {
-  MyIPAddressPrivate *priv = MY_IP_ADDRESS_GET_PRIVATE (entry);
-  guint k = event->keyval;
-  gint cursor, value;
+    MyIPAddressPrivate *priv = MY_IP_ADDRESS_GET_PRIVATE (entry);
+    guint k = event->keyval;
+    gint cursor, value;
 
-  /* If the key is an integer, append the new number to the address. This is only
-   * done if the resulting number will be less than 255. */
-  if ((k >= GDK_0 && k <= GDK_9) || (k >= GDK_KP_0 && k <= GDK_KP_9))
-  {
-    cursor = floor (gtk_editable_get_position (GTK_EDITABLE (entry)) / 4);
-    value = g_ascii_digit_value (event->string[0]);
-
-    if ((priv->address[cursor] == 25) && (value > 5))
-      return TRUE;
-    if (priv->address[cursor] < 26)
+    if ((k >= GDK_KEY_0 && k <= GDK_KEY_9) || (k >= GDK_KEY_0 && k <= GDK_KEY_9))
     {
-      priv->address[cursor] *= 10;
-      priv->address[cursor] += value;
-      my_ip_address_render (MY_IP_ADDRESS (entry));
-      gtk_editable_set_position (GTK_EDITABLE (entry), (4 * cursor) + 3);
-      g_signal_emit_by_name ((gpointer) entry, "ip-changed");
+        cursor = floor (gtk_editable_get_position (GTK_EDITABLE (entry)) / 4);
+        value = g_ascii_digit_value (event->string[0]);
+
+        if ((priv->address[cursor] == 25) && (value > 5))
+            return TRUE;
+        if (priv->address[cursor] < 26)
+        {
+            priv->address[cursor] *= 10;
+            priv->address[cursor] += value;
+            my_ip_address_render (MY_IP_ADDRESS (entry));
+            gtk_editable_set_position (GTK_EDITABLE (entry), (4 * cursor) + 3);
+            g_signal_emit_by_name ((gpointer) entry, "ip-changed");
+        }
     }
-  }
 
-  /* Move to the next number or wrap around to the first. */
-  else if (k == GDK_Tab)
-  {
-    cursor = (floor (gtk_editable_get_position (GTK_EDITABLE (entry)) / 4) + 1);
-    gtk_editable_set_position (GTK_EDITABLE (entry), (4 * (cursor % 4)) + 3);
-  }
+    else if (k == GDK_KEY_Tab)
+    {
+        cursor = (floor (gtk_editable_get_position (GTK_EDITABLE (entry)) / 4) + 1);
+        gtk_editable_set_position (GTK_EDITABLE (entry), (4 * (cursor % 4)) + 3);
+    }
 
-  /* Delete the last digit of the current number. This just divides the number by
-   * 10, relying on the fact that any remainder will be ignored. */
-  else if (k == GDK_BackSpace)
-  {
-    cursor = floor (gtk_editable_get_position (GTK_EDITABLE (entry)) / 4);
-    priv->address[cursor] /= 10;
-    my_ip_address_render (MY_IP_ADDRESS (entry));
-    gtk_editable_set_position (GTK_EDITABLE (entry), (4 * cursor) + 3);
-    g_signal_emit_by_name ((gpointer) entry, "ip-changed");
-  }
+    else if (k == GDK_KEY_BackSpace)
+    {
+        cursor = floor (gtk_editable_get_position (GTK_EDITABLE (entry)) / 4);
+        priv->address[cursor] /= 10;
+        my_ip_address_render (MY_IP_ADDRESS (entry));
+        gtk_editable_set_position (GTK_EDITABLE (entry), (4 * cursor) + 3);
+        g_signal_emit_by_name ((gpointer) entry, "ip-changed");
+    }
 
-  /* Activate the GtkEntry widget, which corresponds to the activate signal. */
-  else if ((k == GDK_Return) || (k == GDK_KP_Enter))
-    gtk_widget_activate (GTK_WIDGET (entry));
+    else if ((k == GDK_KEY_Return) || (k == GDK_KEY_KP_Enter))
+        gtk_widget_activate (GTK_WIDGET (entry));
 
-  return TRUE;
+    return TRUE;
 }
 ```
 
@@ -589,4 +596,6 @@ ip_address_changed (MyIPAddress *ipaddress)
 ```
 
 # Домашнє завдання
+
+Розробіть віджет на основі GtkEntry, який дозволяє вводити час в форматі hh:mm:
 
